@@ -3,17 +3,19 @@ package com.kilomobi.cigobox
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class InventoryViewModel(private val stateHandle: SavedStateHandle) : ViewModel() {
     private var restInterface: InventoryApiService
-    private lateinit var inventoryCall: Call<List<Appetizer>>
     val state = mutableStateOf(emptyList<Appetizer>())
     val allowEdit = mutableStateOf(false)
+
+    private val errorHandler = CoroutineExceptionHandler { _, exception ->
+        exception.printStackTrace()
+    }
 
     init {
         val retrofit: Retrofit = Retrofit.Builder()
@@ -25,23 +27,17 @@ class InventoryViewModel(private val stateHandle: SavedStateHandle) : ViewModel(
     }
 
     private fun getInventory() {
-        inventoryCall = restInterface.getInventory()
-        inventoryCall.enqueue(
-            object : Callback<List<Appetizer>> {
-                override fun onResponse(
-                    call: Call<List<Appetizer>>,
-                    response: Response<List<Appetizer>>
-                ) {
-                    response.body()?.let { appetizers ->
-                        val appetizerList = appetizers.map { it.copy(isVisible = true) }
-                        state.value = appetizerList.restoreSelections()
-                    }
-                }
+        viewModelScope.launch(errorHandler) {
+            val remoteList = getRemoteInventory()
+            val appetizerList = remoteList.map { it.copy(isVisible = true) }
+            state.value = appetizerList.restoreSelections()
+        }
+    }
 
-                override fun onFailure(call: Call<List<Appetizer>>, t: Throwable) {
-                    t.printStackTrace()
-                }
-            })
+    private suspend fun getRemoteInventory(): List<Appetizer> {
+        return withContext(Dispatchers.IO) {
+            restInterface.getInventory()
+        }
     }
 
     private fun updateQuantity(id: Int, quantityChange: Int) {
@@ -101,11 +97,6 @@ class InventoryViewModel(private val stateHandle: SavedStateHandle) : ViewModel(
             return restaurantsMap.values.toList()
         }
         return this
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        inventoryCall.cancel()
     }
 
     companion object {
