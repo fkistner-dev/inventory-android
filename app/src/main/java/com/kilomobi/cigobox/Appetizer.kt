@@ -13,6 +13,7 @@ data class Appetizer(
     val category: String,
     @SerializedName("a_quantity")
     val quantity: Int,
+    val isQuantityUpdated: Boolean = false,
     val isEditable: Boolean = false,
     val isVisible: Boolean = true,
     @SerializedName("a_usedInBox")

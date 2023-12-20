@@ -39,6 +39,18 @@ class InventoryViewModel : ViewModel() {
         }
     }
 
+    private suspend fun updateRemoteQuantity(id: Int, quantity: Int): Boolean {
+        return withContext(Dispatchers.IO) {
+            return@withContext try {
+                restInterface.updateQuantity(id, quantity)
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
     private fun updateQuantity(id: Int, quantityChange: Int) {
         val appetizers = state.value.toMutableList()
         val itemIndex = appetizers.indexOfFirst { it.id == id }
@@ -46,7 +58,7 @@ class InventoryViewModel : ViewModel() {
         if (itemIndex != -1) {
             val item = appetizers[itemIndex]
             appetizers[itemIndex] =
-                item.copy(quantity = (item.quantity + quantityChange).coerceAtLeast(0))
+                item.copy(quantity = (item.quantity + quantityChange).coerceAtLeast(0), isQuantityUpdated = true)
             state.value = appetizers
         }
     }
@@ -69,6 +81,7 @@ class InventoryViewModel : ViewModel() {
         state.value = currentList.map { it.copy(isEditable = !it.isEditable) }
     }
 
+    // Used to filters between categories, and return a list with correct items visibility
     fun filterAction(category: Category) {
         val currentList = state.value
         val filteredList =
@@ -79,7 +92,26 @@ class InventoryViewModel : ViewModel() {
         state.value = visibleList
     }
 
+    // Update each modified item on remote db and handle toggles
     fun validateStock() {
+        viewModelScope.launch(errorHandler) {
+            pushUpdatedQuantities()
+        }
+
+        // Disable the editable view
         toggleEdit()
+    }
+
+    private suspend fun pushUpdatedQuantities() {
+        return withContext(Dispatchers.IO) {
+            val modifiedValues = state.value.filter { it.isQuantityUpdated }
+            modifiedValues.forEach {
+                updateRemoteQuantity(it.id, it.quantity)
+            }
+            val newList = state.value.map { item ->
+                item.copy(isQuantityUpdated = true)
+            }
+            state.value = newList
+        }
     }
 }
