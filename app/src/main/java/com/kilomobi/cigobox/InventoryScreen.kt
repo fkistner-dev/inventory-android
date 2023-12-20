@@ -201,14 +201,14 @@ fun AppetizerItem(
                     Modifier.weight(0.15f)
                 ) { onDecreaseAction(item.id) }
                 AppetizerQuantity(item.quantity.toString(), Modifier.weight(0.10f))
-                AppetizerDetails(item.title, item.provider, Modifier.weight(0.60f))
+                AppetizerDetails(item.title, item.supplier, Modifier.weight(0.60f))
                 AppetizerIcon(
                     Icons.Filled.KeyboardArrowUp,
                     Modifier.weight(0.15f)
                 ) { onIncreaseAction(item.id) }
             } else {
                 AppetizerQuantity(item.quantity.toString(), Modifier.weight(0.20f))
-                AppetizerDetails(item.title, item.provider, Modifier.weight(0.80f))
+                AppetizerDetails(item.title, item.supplier, Modifier.weight(0.80f))
             }
         }
     }

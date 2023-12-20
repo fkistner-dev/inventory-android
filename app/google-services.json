@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "458469280926",
+    "project_id": "cigobox-alsace",
+    "storage_bucket": "cigobox-alsace.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458469280926:android:b6fcb4392838a00569bf8f",
+        "android_client_info": {
+          "package_name": "com.kilomobi.cigobox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgA82FOpNhR9uFjqkmdM_D21uxY56-sWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458469280926:android:2caa559b829d8f5769bf8f",
+        "android_client_info": {
+          "package_name": "com.kilomobi.cigobox.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgA82FOpNhR9uFjqkmdM_D21uxY56-sWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

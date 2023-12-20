@@ -8,3 +8,6 @@ enum class Category {
     FOURNISSEURS
 }
 
+fun String.toCategory() : Category {
+    return Category.valueOf(this)
+}
