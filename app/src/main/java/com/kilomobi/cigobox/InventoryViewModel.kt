@@ -9,8 +9,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class InventoryViewModel : ViewModel() {
     private var restInterface: InventoryApiService
-    val state = mutableStateOf(emptyList<Appetizer>())
+    val items = mutableStateOf(emptyList<Appetizer>())
     val allowEdit = mutableStateOf(false)
+    val selectedFilter = mutableStateOf(Category.TOUT)
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
@@ -29,7 +30,7 @@ class InventoryViewModel : ViewModel() {
         viewModelScope.launch(errorHandler) {
             val remoteList = getRemoteInventory()
             val appetizerList = remoteList.map { it.copy(isVisible = true) }
-            state.value = appetizerList
+            items.value = appetizerList
         }
     }
 
@@ -52,14 +53,14 @@ class InventoryViewModel : ViewModel() {
     }
 
     private fun updateQuantity(id: Int, quantityChange: Int) {
-        val appetizers = state.value.toMutableList()
+        val appetizers = items.value.toMutableList()
         val itemIndex = appetizers.indexOfFirst { it.id == id }
 
         if (itemIndex != -1) {
             val item = appetizers[itemIndex]
             appetizers[itemIndex] =
                 item.copy(quantity = (item.quantity + quantityChange).coerceAtLeast(0), isQuantityUpdated = true)
-            state.value = appetizers
+            items.value = appetizers
         }
     }
 
@@ -77,19 +78,20 @@ class InventoryViewModel : ViewModel() {
     }
 
     private fun toggleEditItems() {
-        val currentList = state.value
-        state.value = currentList.map { it.copy(isEditable = !it.isEditable) }
+        val currentList = items.value
+        items.value = currentList.map { it.copy(isEditable = !it.isEditable) }
     }
 
     // Used to filters between categories, and return a list with correct items visibility
     fun filterAction(category: Category) {
-        val currentList = state.value
+        val currentList = items.value
         val filteredList =
             currentList.filter { it.category.toCategory().name == category.name || it.category == Category.TOUT.name }
         val visibleList = currentList.map { item ->
             item.copy(isVisible = item in filteredList)
         }
-        state.value = visibleList
+        selectedFilter.value = category
+        items.value = visibleList
     }
 
     // Update each modified item on remote db and handle toggles
@@ -104,14 +106,14 @@ class InventoryViewModel : ViewModel() {
 
     private suspend fun pushUpdatedQuantities() {
         return withContext(Dispatchers.IO) {
-            val modifiedValues = state.value.filter { it.isQuantityUpdated }
+            val modifiedValues = items.value.filter { it.isQuantityUpdated }
             modifiedValues.forEach {
                 updateRemoteQuantity(it.id, it.quantity)
             }
-            val newList = state.value.map { item ->
+            val newList = items.value.map { item ->
                 item.copy(isQuantityUpdated = true)
             }
-            state.value = newList
+            items.value = newList
         }
     }
 }

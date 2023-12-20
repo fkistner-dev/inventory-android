@@ -22,13 +22,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,11 +62,14 @@ fun InventoryScreen() {
                 Category.CADENAS,
                 Category.FOURNISSEURS
             )
-            HorizontalFilterRow(filterList, onFilterSelected = { selectedFilter ->
-                viewModel.filterAction(selectedFilter)
-            })
+            HorizontalFilterRow(
+                filterList,
+                selectedFilter = viewModel.selectedFilter.value,
+                onFilterSelected = { selectedFilter ->
+                    viewModel.filterAction(selectedFilter)
+                })
         }
-        items(viewModel.state.value) { appetizer ->
+        items(viewModel.items.value) { appetizer ->
             if (appetizer.isVisible) {
                 AppetizerItem(
                     item = appetizer,
@@ -81,6 +83,7 @@ fun InventoryScreen() {
 @Composable
 fun HorizontalFilterRow(
     filters: List<Category>,
+    selectedFilter: Category?,
     onFilterSelected: (Category) -> Unit
 ) {
     LazyRow(
@@ -90,6 +93,7 @@ fun HorizontalFilterRow(
         items(filters) { filter ->
             FilterButton(
                 filter = filter.name,
+                isSelected = filter == selectedFilter,
                 onFilterSelected = { onFilterSelected(it) }
             )
         }
@@ -99,18 +103,16 @@ fun HorizontalFilterRow(
 @Composable
 fun FilterButton(
     filter: String,
+    isSelected: Boolean,
     onFilterSelected: (Category) -> Unit
 ) {
-    val colorState = remember { mutableStateOf(Color.White) }
-
     Button(
         onClick = {
             onFilterSelected(Category.valueOf(filter))
-            colorState.value = if (colorState.value == CigOrange) Color.White else CigOrange
         },
         border = BorderStroke(2.dp, CigOrange),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorState.value
+            containerColor = if (isSelected) CigOrange else CigoGrey
         )
     ) {
         Text(text = filter, color = Color.Black)
@@ -127,21 +129,17 @@ fun HeaderItem(
             Image(painterResource(R.drawable.logo_cigobox), "logo", Modifier.size(200.dp))
         }
         Column(Modifier.weight(0.5f), Arrangement.Center, Alignment.CenterHorizontally) {
-            val colorEditState = remember { mutableStateOf(Color.White) }
-            val colorBoxState = remember { mutableStateOf(Color.White) }
-
             Button(
                 border = BorderStroke(2.dp, CigOrange),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorEditState.value
+                    containerColor = if (allowEdit) CigOrange else Color.White
                 ),
                 onClick = {
-                    onEditAction(); colorEditState.value =
-                    if (colorEditState.value == CigOrange) Color.White else CigOrange
+                    onEditAction()
                 }
             ) {
                 Text(
-                    "Editer le stock",
+                    stringResource(id = R.string.btn_edit_stock),
                     color = Color.Black,
                     fontSize = 16.sp
                 )
@@ -155,7 +153,7 @@ fun HeaderItem(
                     onClick = { }
                 ) {
                     Text(
-                        "Soustraire Box", color = Color.Black,
+                        stringResource(id = R.string.btn_substract_box), color = Color.Black,
                         fontSize = 16.sp
                     )
                 }
@@ -171,7 +169,7 @@ fun HeaderItem(
                     }
                 ) {
                     Text(
-                        "Valider", color = Color.Black,
+                        stringResource(id = R.string.btn_validate), color = Color.Black,
                         fontSize = 16.sp
                     )
                 }
