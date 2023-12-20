@@ -24,7 +24,6 @@ data class Appetizer(
     @SerializedName("a_quantity")
     val quantity: Int,
     val isQuantityUpdated: Boolean = false,
-    val isEditable: Boolean = false,
     val isVisible: Boolean = true,
     @ColumnInfo("a_usedInBox")
     @SerializedName("a_usedInBox")

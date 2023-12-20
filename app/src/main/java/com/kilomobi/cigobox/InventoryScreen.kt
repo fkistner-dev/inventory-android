@@ -61,6 +61,7 @@ fun InventoryScreen() {
             if (appetizer.isVisible) {
                 AppetizerItem(
                     item = appetizer,
+                    viewModel.allowEdit.value,
                     onIncreaseAction = { id -> viewModel.increaseQuantity(id) },
                     onDecreaseAction = { id -> viewModel.decreaseQuantity(id) })
             }
@@ -71,6 +72,7 @@ fun InventoryScreen() {
 @Composable
 fun AppetizerItem(
     item: Appetizer,
+    isEditable: Boolean,
     onIncreaseAction: (id: Int) -> Unit,
     onDecreaseAction: (id: Int) -> Unit
 ) {
@@ -83,7 +85,7 @@ fun AppetizerItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp)
         ) {
-            if (item.isEditable) {
+            if (isEditable) {
                 AppetizerIcon(
                     Icons.Filled.KeyboardArrowDown,
                     Modifier.weight(0.15f)

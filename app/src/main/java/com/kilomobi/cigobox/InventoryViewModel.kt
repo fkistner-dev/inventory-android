@@ -117,12 +117,6 @@ class InventoryViewModel : ViewModel() {
 
     fun toggleEdit() {
         allowEdit.value = !allowEdit.value
-        toggleEditItems()
-    }
-
-    private fun toggleEditItems() {
-        val currentList = items.value
-        items.value = currentList.map { it.copy(isEditable = !it.isEditable) }
     }
 
     // Used to filters between categories, and return a list with correct items visibility
