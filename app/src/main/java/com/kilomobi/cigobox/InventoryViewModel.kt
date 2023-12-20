@@ -4,11 +4,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.ConnectException
+import java.net.UnknownHostException
 
 class InventoryViewModel : ViewModel() {
     private var restInterface: InventoryApiService
+    private var inventoryDao = InventoryDb.getDaoInstance(CigoBoxApplication.getAppContext())
     val items = mutableStateOf(emptyList<Appetizer>())
     val allowEdit = mutableStateOf(false)
     val selectedFilter = mutableStateOf(Category.TOUT)
@@ -28,16 +32,34 @@ class InventoryViewModel : ViewModel() {
 
     private fun getInventory() {
         viewModelScope.launch(errorHandler) {
-            val remoteList = getRemoteInventory()
+            val remoteList = getAllInventory()
             val appetizerList = remoteList.map { it.copy(isVisible = true) }
             items.value = appetizerList
         }
     }
 
-    private suspend fun getRemoteInventory(): List<Appetizer> {
+    private suspend fun getAllInventory(): List<Appetizer> {
         return withContext(Dispatchers.IO) {
-            restInterface.getInventory()
+            try {
+                refreshCache()
+            } catch (e: Exception) {
+                when (e) {
+                    is UnknownHostException,
+                    is ConnectException,
+                    is HttpException -> {
+                        if (inventoryDao.getAll().isEmpty())
+                            throw Exception("Something went wrong. We have no data.")
+                    }
+                    else -> throw e
+                }
+            }
+            return@withContext inventoryDao.getAll()
         }
+    }
+
+    private suspend fun refreshCache() {
+        val remoteInventory = restInterface.getInventory()
+        inventoryDao.addAll(remoteInventory)
     }
 
     private suspend fun updateRemoteQuantity(id: Int, quantity: Int): Boolean {
@@ -59,17 +81,38 @@ class InventoryViewModel : ViewModel() {
         if (itemIndex != -1) {
             val item = appetizers[itemIndex]
             appetizers[itemIndex] =
-                item.copy(quantity = (item.quantity + quantityChange).coerceAtLeast(0), isQuantityUpdated = true)
+                item.copy(
+                    quantity = (item.quantity + quantityChange).coerceAtLeast(0),
+                    isQuantityUpdated = true
+                )
             items.value = appetizers
+            viewModelScope.launch {
+                updateQuantityAppetizer(id, item.quantity)
+            }
         }
     }
 
-    fun increaseQuantity(id: Int) {
-        updateQuantity(id, 1)
+    private suspend fun updateQuantityAppetizer(id: Int, value: Int) {
+        withContext(Dispatchers.IO) {
+            inventoryDao.update(PartialAppetizer(id, value))
+            // Retrieve the content of our local db
+            inventoryDao.getAll()
+        }
     }
 
-    fun decreaseQuantity(id: Int) {
-        updateQuantity(id, -1)
+    fun increaseQuantity(id: Int, quantity: Int = 1) {
+        updateQuantity(id, quantity)
+    }
+
+    fun decreaseQuantity(id: Int, quantity: Int = -1) {
+        updateQuantity(id, quantity)
+    }
+
+    // Handle a bunch of items to subtract within a box
+    fun subtractBox(operations: List<BoxOperation>) {
+        operations.forEach {
+            updateQuantity(it.id, it.quantity)
+        }
     }
 
     fun toggleEdit() {
@@ -97,21 +140,21 @@ class InventoryViewModel : ViewModel() {
     // Update each modified item on remote db and handle toggles
     fun validateStock() {
         viewModelScope.launch(errorHandler) {
-            pushUpdatedQuantities()
+            pushUpdatedQuantities(items.value.filter { it.isQuantityUpdated })
         }
 
         // Disable the editable view
         toggleEdit()
     }
 
-    private suspend fun pushUpdatedQuantities() {
+    private suspend fun pushUpdatedQuantities(modifiedValues: List<Appetizer>) {
         return withContext(Dispatchers.IO) {
-            val modifiedValues = items.value.filter { it.isQuantityUpdated }
             modifiedValues.forEach {
                 updateRemoteQuantity(it.id, it.quantity)
+                updateQuantityAppetizer(it.id, it.quantity)
             }
             val newList = items.value.map { item ->
-                item.copy(isQuantityUpdated = true)
+                item.copy(isQuantityUpdated = false)
             }
             items.value = newList
         }
