@@ -1,14 +1,13 @@
 package com.kilomobi.cigobox
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class InventoryViewModel(private val stateHandle: SavedStateHandle) : ViewModel() {
+class InventoryViewModel : ViewModel() {
     private var restInterface: InventoryApiService
     val state = mutableStateOf(emptyList<Appetizer>())
     val allowEdit = mutableStateOf(false)
@@ -30,7 +29,7 @@ class InventoryViewModel(private val stateHandle: SavedStateHandle) : ViewModel(
         viewModelScope.launch(errorHandler) {
             val remoteList = getRemoteInventory()
             val appetizerList = remoteList.map { it.copy(isVisible = true) }
-            state.value = appetizerList.restoreSelections()
+            state.value = appetizerList
         }
     }
 
@@ -74,32 +73,13 @@ class InventoryViewModel(private val stateHandle: SavedStateHandle) : ViewModel(
         val currentList = state.value
         val filteredList =
             currentList.filter { it.category.toCategory().name == category.name || it.category == Category.TOUT.name }
-        state.value = currentList.map { item ->
+        val visibleList = currentList.map { item ->
             item.copy(isVisible = item in filteredList)
         }
+        state.value = visibleList
     }
 
     fun validateStock() {
         toggleEdit()
-    }
-
-    private fun storeSelection(item: Appetizer) {
-        val savedItems = stateHandle.get<List<Appetizer>?>(APPETIZERS)
-            .orEmpty().toMutableList()
-        savedItems.clear()
-        savedItems.add(item)
-        stateHandle[APPETIZERS] = savedItems
-    }
-
-    private fun List<Appetizer>.restoreSelections(): List<Appetizer> {
-        stateHandle.get<List<Appetizer>?>(APPETIZERS)?.let {
-            val restaurantsMap = this.associateBy { it.id }
-            return restaurantsMap.values.toList()
-        }
-        return this
-    }
-
-    companion object {
-        const val APPETIZERS = "appetizers"
     }
 }
