@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 @Database(
     entities = [Appetizer::class],
     version = 1,
     exportSchema = false
 )
+@TypeConverters(Appetizer.UsedInBoxConverter::class)
 abstract class InventoryDb : RoomDatabase() {
     abstract val dao: InventoryDao
 
