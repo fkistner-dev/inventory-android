@@ -1,0 +1,334 @@
+{
+    "appetizers": [
+        {
+            "a_buffer_size": "3",
+            "a_category": "SOFT",
+            "a_id": 0,
+            "a_quantity": "3",
+            "a_supplier": "Jean Jacques",
+            "a_title": "Limonade",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "3",
+            "a_category": "ALCOOL",
+            "a_id": 1,
+            "a_quantity": "5",
+            "a_supplier": "Claude Jean",
+            "a_title": "Bière",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "3",
+            "a_category": "ALCOOL",
+            "a_id": 2,
+            "a_quantity": "2",
+            "a_supplier": "Hervé Dulac",
+            "a_title": "Crémant",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "0",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "3",
+            "a_category": "ALCOOL",
+            "a_id": 3,
+            "a_quantity": "2",
+            "a_supplier": "Serge Lamah",
+            "a_title": "Vin",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "0",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "1",
+            "a_category": "SEC",
+            "a_id": 4,
+            "a_quantity": "1",
+            "a_supplier": "Sarah Pelle",
+            "a_title": "Saucisson",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "3",
+            "a_category": "SOFT",
+            "a_id": 5,
+            "a_quantity": "1",
+            "a_supplier": "Sarah Maine",
+            "a_title": "Jus de fruits",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "0",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "0",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "3",
+            "a_category": "ALCOOL",
+            "a_id": 6,
+            "a_quantity": "8",
+            "a_supplier": "Sarah Joute",
+            "a_title": "Mignonette",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "0",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "0",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "1",
+            "a_category": "FRAIS",
+            "a_id": 7,
+            "a_quantity": "1",
+            "a_supplier": "Sarah Crochet",
+            "a_title": "Terrine au Canard",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "1",
+            "a_category": "FRAIS",
+            "a_id": 8,
+            "a_quantity": "8",
+            "a_supplier": "Florent Mage",
+            "a_title": "Brie de Meau",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "0",
+            "a_category": "SEC",
+            "a_id": 9,
+            "a_quantity": "5",
+            "a_supplier": "Bernard Langer",
+            "a_title": "Pain au pavot",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        },
+        {
+            "a_buffer_size": "3",
+            "a_category": "SEC",
+            "a_id": 10,
+            "a_quantity": "2",
+            "a_supplier": "Bernard Sel",
+            "a_title": "Bretzels",
+            "a_usedInBox": [
+                {
+                    "box_quantity": "1",
+                    "player_count": "3"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "4"
+                },
+                {
+                    "box_quantity": "1",
+                    "player_count": "5"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "6"
+                },
+                {
+                    "box_quantity": "2",
+                    "player_count": "7"
+                }
+            ]
+        }
+    ]
+}
