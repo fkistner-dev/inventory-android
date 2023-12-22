@@ -1,8 +1,25 @@
-package com.kilomobi.cigobox
+/*
+ * Created by fkistner.
+ * fabrice.kistner.pro@gmail.com
+ * Last modified on 22/12/2023 21:51.
+ * Copyright (c) 2023.
+ * All rights reserved.
+ */
+
+package com.kilomobi.cigobox.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kilomobi.cigobox.BuildConfig
+import com.kilomobi.cigobox.CigoBoxApplication
+import com.kilomobi.cigobox.data.InventoryDb
+import com.kilomobi.cigobox.data.api.InventoryApiService
+import com.kilomobi.cigobox.model.Appetizer
+import com.kilomobi.cigobox.model.BoxOperation
+import com.kilomobi.cigobox.model.Category
+import com.kilomobi.cigobox.model.PartialAppetizer
+import com.kilomobi.cigobox.model.toCategory
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import retrofit2.Retrofit

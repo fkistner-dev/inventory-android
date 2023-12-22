@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by fkistner.
+  ~ fabrice.kistner.pro@gmail.com
+  ~ Last modified on 22/12/2023 21:51.
+  ~ Copyright (c) 2023.
+  ~ All rights reserved.
+  -->
+
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background" />
     <foreground android:drawable="@drawable/ic_launcher_foreground" />

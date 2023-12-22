@@ -1,10 +1,20 @@
-package com.kilomobi.cigobox
+/*
+ * Created by fkistner.
+ * fabrice.kistner.pro@gmail.com
+ * Last modified on 22/12/2023 21:51.
+ * Copyright (c) 2023.
+ * All rights reserved.
+ */
+
+package com.kilomobi.cigobox.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.kilomobi.cigobox.model.Appetizer
+import com.kilomobi.cigobox.model.PartialAppetizer
 
 @Dao
 interface InventoryDao {

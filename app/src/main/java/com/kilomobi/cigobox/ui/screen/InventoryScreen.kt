@@ -1,4 +1,12 @@
-package com.kilomobi.cigobox
+/*
+ * Created by fkistner.
+ * fabrice.kistner.pro@gmail.com
+ * Last modified on 22/12/2023 21:51.
+ * Copyright (c) 2023.
+ * All rights reserved.
+ */
+
+package com.kilomobi.cigobox.ui.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -30,6 +38,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kilomobi.cigobox.model.Appetizer
+import com.kilomobi.cigobox.model.BoxOperation
+import com.kilomobi.cigobox.model.Category
+import com.kilomobi.cigobox.viewmodel.InventoryViewModel
 import com.kilomobi.cigobox.ui.theme.CigOrange
 import com.kilomobi.cigobox.ui.theme.CigoGrey
 

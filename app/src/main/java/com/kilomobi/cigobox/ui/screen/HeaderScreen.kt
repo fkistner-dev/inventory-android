@@ -1,4 +1,12 @@
-package com.kilomobi.cigobox
+/*
+ * Created by fkistner.
+ * fabrice.kistner.pro@gmail.com
+ * Last modified on 22/12/2023 21:51.
+ * Copyright (c) 2023.
+ * All rights reserved.
+ */
+
+package com.kilomobi.cigobox.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -17,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kilomobi.cigobox.R
 import com.kilomobi.cigobox.ui.theme.CigOrange
 import com.kilomobi.cigobox.ui.theme.CigoGreen
 

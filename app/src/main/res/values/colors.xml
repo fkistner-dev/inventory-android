@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by fkistner.
+  ~ fabrice.kistner.pro@gmail.com
+  ~ Last modified on 22/12/2023 21:51.
+  ~ Copyright (c) 2023.
+  ~ All rights reserved.
+  -->
+
 <resources>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>

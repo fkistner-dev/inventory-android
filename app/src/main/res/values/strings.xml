@@ -1,3 +1,11 @@
+<!--
+  ~ Created by fkistner.
+  ~ fabrice.kistner.pro@gmail.com
+  ~ Last modified on 22/12/2023 21:51.
+  ~ Copyright (c) 2023.
+  ~ All rights reserved.
+  -->
+
 <resources>
     <string name="app_name">Cigo\'Box</string>
     <string name="btn_edit_stock">Editer le stock</string>
