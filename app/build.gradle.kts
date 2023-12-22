@@ -22,6 +22,21 @@ android {
         }
     }
 
+    android.buildFeatures.buildConfig = true
+    flavorDimensions.add("environment")
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            buildConfigField("String", "DATABASE_URL", "\"https://cigo-box-dev-default-rtdb.europe-west1.firebasedatabase.app/\"")
+        }
+
+        create("prod") {
+            dimension = "environment"
+            buildConfigField("String", "DATABASE_URL", "\"redacted\"")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -76,4 +91,6 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
 }
