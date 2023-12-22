@@ -2,10 +2,10 @@ package com.kilomobi.cigobox
 
 enum class Category {
     TOUT,
-    BOISSONS,
-    NOURRITURES,
-    CADENAS,
-    FOURNISSEURS
+    ALCOOL,
+    SOFT,
+    FRAIS,
+    SEC
 }
 
 fun String.toCategory() : Category {
