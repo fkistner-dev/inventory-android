@@ -15,7 +15,9 @@ class InventoryViewModel : ViewModel() {
     private var inventoryDao = InventoryDb.getDaoInstance(CigoBoxApplication.getAppContext())
     val items = mutableStateOf(emptyList<Appetizer>())
     val allowEdit = mutableStateOf(false)
+    val isBoxScreen = mutableStateOf(false)
     val selectedFilter = mutableStateOf(Category.TOUT)
+    var selectedPlayerBox = mutableStateOf(0)
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
@@ -24,7 +26,7 @@ class InventoryViewModel : ViewModel() {
     init {
         val retrofit: Retrofit = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("redacted")
+            .baseUrl(BuildConfig.DATABASE_URL)
             .build()
         restInterface = retrofit.create(InventoryApiService::class.java)
         getInventory()
@@ -50,6 +52,7 @@ class InventoryViewModel : ViewModel() {
                         if (inventoryDao.getAll().isEmpty())
                             throw Exception("Something went wrong. We have no data.")
                     }
+
                     else -> throw e
                 }
             }
@@ -80,9 +83,15 @@ class InventoryViewModel : ViewModel() {
 
         if (itemIndex != -1) {
             val item = appetizers[itemIndex]
+            var newQuantity = quantityChange.coerceAtLeast(0)
+            if (allowEdit.value) {
+                // allow decrease
+                newQuantity = (item.quantity + quantityChange).coerceAtLeast(0)
+
+            }
             appetizers[itemIndex] =
                 item.copy(
-                    quantity = (item.quantity + quantityChange).coerceAtLeast(0),
+                    quantity = newQuantity,
                     isQuantityUpdated = true
                 )
             items.value = appetizers
@@ -109,21 +118,48 @@ class InventoryViewModel : ViewModel() {
     }
 
     // Handle a bunch of items to subtract within a box
-    fun subtractBox(operations: List<BoxOperation>) {
-        operations.forEach {
-            updateQuantity(it.id, it.quantity)
+    fun subtractBox() {
+        isBoxScreen.value = !isBoxScreen.value
+    }
+
+    fun getBoxOperationList(playerCount: Int): List<BoxOperation> {
+        val currentList = items.value
+        val boxOperationList = mutableListOf<BoxOperation>()
+
+        currentList.forEach { appetizer ->
+            appetizer.usedInBox.find { it.playerCount == playerCount }?.let { usedInBox ->
+                // Add a BoxOperation for each appetizer used in the box
+                boxOperationList.add(
+                    BoxOperation(
+                        playerCount = playerCount,
+                        title = appetizer.title,
+                        appetizerId = appetizer.id,
+                        supplier = appetizer.supplier,
+                        boxQuantity = appetizer.quantity,
+                        withdrawQuantity = usedInBox.boxQuantity
+                    )
+                )
+            }
         }
+
+        return boxOperationList
     }
 
     fun toggleEdit() {
         allowEdit.value = !allowEdit.value
     }
 
+    private fun toggleReset() {
+        allowEdit.value = false
+        isBoxScreen.value = false
+        selectedPlayerBox.value = 0
+    }
+
     // Used to filters between categories, and return a list with correct items visibility
     fun filterAction(category: Category) {
         val currentList = items.value
         val filteredList =
-            currentList.filter { it.category.toCategory().name == category.name || it.category == Category.TOUT.name }
+            currentList.filter { it.category.toCategory().name == category.name || category.name == Category.TOUT.name }
         val visibleList = currentList.map { item ->
             item.copy(isVisible = item in filteredList)
         }
@@ -131,26 +167,49 @@ class InventoryViewModel : ViewModel() {
         items.value = visibleList
     }
 
+    fun selectBoxAction(playerCount: Int) {
+        selectedPlayerBox.value = playerCount
+    }
+
     // Update each modified item on remote db and handle toggles
     fun validateStock() {
-        viewModelScope.launch(errorHandler) {
-            pushUpdatedQuantities(items.value.filter { it.isQuantityUpdated })
+        if (allowEdit.value) {
+            viewModelScope.launch(errorHandler) {
+                pushUpdatedQuantities(items.value.filter { it.isQuantityUpdated })
+            }
+        } else if (isBoxScreen.value) {
+            viewModelScope.launch(errorHandler) {
+                pushUpdatedOperations(getBoxOperationList(selectedPlayerBox.value)
+                    .filter { it.withdrawQuantity > 0 }
+                )
+            }
         }
 
-        // Disable the editable view
-        toggleEdit()
+        // Disable change
+        toggleReset()
+    }
+
+    private suspend inline fun <reified T : Any> pushUpdatedQuantities(
+        modifiedValues: List<T>,
+        crossinline getId: (T) -> Int,
+        crossinline getQuantity: (T) -> Int
+    ) {
+        withContext(Dispatchers.IO) {
+            modifiedValues.forEach {
+                updateQuantity(getId(it), getQuantity(it))
+                updateRemoteQuantity(getId(it), getQuantity(it).coerceAtLeast(0))
+            }
+        }
+    }
+
+    private suspend fun pushUpdatedOperations(modifiedValues: List<BoxOperation>) {
+        pushUpdatedQuantities(
+            modifiedValues,
+            { it.appetizerId },
+            { it.boxQuantity - it.withdrawQuantity })
     }
 
     private suspend fun pushUpdatedQuantities(modifiedValues: List<Appetizer>) {
-        return withContext(Dispatchers.IO) {
-            modifiedValues.forEach {
-                updateRemoteQuantity(it.id, it.quantity)
-                updateQuantityAppetizer(it.id, it.quantity)
-            }
-            val newList = items.value.map { item ->
-                item.copy(isQuantityUpdated = false)
-            }
-            items.value = newList
-        }
+        pushUpdatedQuantities(modifiedValues, { it.id }, { it.quantity })
     }
 }
