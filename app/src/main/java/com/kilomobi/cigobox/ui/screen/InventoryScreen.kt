@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -200,9 +201,10 @@ private fun AppetizerQuantity(quantity: Int = 1, bufferSize: Int? = null, modifi
         if (hasBuffer) {
             Spacer(modifier = Modifier.width(10.dp))
             Icon(
-                Icons.Outlined.Warning,
+                imageVector = Icons.Outlined.Warning,
+                tint = Color.Black,
                 contentDescription = "stock alert",
-                Modifier.clickable {
+                modifier = Modifier.clickable {
                     val message = "Le stock est inférieur au stock tampon ($bufferSize)"
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 }
@@ -231,10 +233,12 @@ private fun AppetizerDetails(
     Column(modifier = modifier) {
         Text(
             text = title,
+            color = Color.Black,
             style = MaterialTheme.typography.headlineMedium
         )
         Text(
             text = description,
+            color = Color.Black,
             style = MaterialTheme.typography.bodyMedium
         )
     }
