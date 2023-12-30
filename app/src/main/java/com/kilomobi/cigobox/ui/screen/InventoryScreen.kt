@@ -11,10 +11,12 @@ package com.kilomobi.cigobox.ui.screen
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,9 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,6 +53,7 @@ import com.kilomobi.cigobox.ui.theme.CigoGrey
 @Composable
 fun InventoryScreen() {
     val viewModel: InventoryViewModel = viewModel()
+    val state = viewModel.state.value
 
     LazyColumn(
         contentPadding = PaddingValues(
@@ -56,24 +61,25 @@ fun InventoryScreen() {
             horizontal = 8.dp
         )
     ) {
+
         item {
             HeaderItem(
-                viewModel.allowEdit.value,
-                viewModel.isBoxScreen.value,
-                viewModel.selectedPlayerBox.value,
+                state.allowEdit,
+                state.isBoxScreen,
+                state.selectedPlayerBox,
                 { viewModel.toggleEdit() },
                 { viewModel.subtractBox() },
                 { viewModel.validateStock() })
         }
 
-        if (viewModel.isBoxScreen.value) {
+        if (state.isBoxScreen) {
             val boxList = listOf(3, 4, 5, 6, 7)
             items(boxList) { playerCount ->
                 val boxOperations = viewModel.getBoxOperationList(playerCount)
                 BoxItem(
                     playerCount.toString(),
                     boxOperations,
-                    viewModel.selectedPlayerBox.value
+                    state.selectedPlayerBox
                 ) { id -> viewModel.selectBoxAction(id) }
             }
         } else {
@@ -88,19 +94,42 @@ fun InventoryScreen() {
 
                 HorizontalFilterRow(
                     filterList,
-                    selectedFilter = viewModel.selectedFilter.value,
+                    selectedFilter = state.selectedFilter,
                     onFilterSelected = { selectedFilter ->
                         viewModel.filterAction(selectedFilter)
                     })
             }
-            items(viewModel.items.value) { appetizer ->
+            items(state.appetizers) { appetizer ->
                 if (appetizer.isVisible) {
                     AppetizerItem(
                         item = appetizer,
-                        viewModel.allowEdit.value,
-                        onIncreaseAction = { id -> viewModel.increaseQuantity(id) },
-                        onDecreaseAction = { id -> viewModel.decreaseQuantity(id) })
+                        state.allowEdit,
+                        onIncreaseAction = { id, quantity ->
+                            viewModel.updateQuantity(
+                                id,
+                                quantity
+                            )
+                        },
+                        onDecreaseAction = { id, quantity ->
+                            viewModel.updateQuantity(
+                                id,
+                                quantity
+                            )
+                        })
                 }
+            }
+        }
+    }
+    if (state.isLoading) LinearProgressIndicator()
+    if (state.error != null) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = state.error,
+                modifier = Modifier.align(Alignment.Center),
+            )
+            Button(onClick = { viewModel.initializeInventory() },
+                modifier = Modifier.align(Alignment.BottomCenter)) {
+                Text(text = "Retry")
             }
         }
     }
@@ -110,8 +139,8 @@ fun InventoryScreen() {
 fun AppetizerItem(
     item: Appetizer,
     isEditable: Boolean,
-    onIncreaseAction: (id: Int) -> Unit,
-    onDecreaseAction: (id: Int) -> Unit
+    onIncreaseAction: (id: Int, quantity: Int) -> Unit,
+    onDecreaseAction: (id: Int, quantity: Int) -> Unit
 ) {
     Card(
         elevation = CardDefaults.cardElevation(),
@@ -126,13 +155,13 @@ fun AppetizerItem(
                 AppetizerIcon(
                     Icons.Filled.KeyboardArrowDown,
                     Modifier.weight(0.15f)
-                ) { onDecreaseAction(item.id) }
+                ) { onDecreaseAction(item.id, item.quantity - 1) }
                 AppetizerQuantity(item.quantity, item.bufferSize, modifier = Modifier.weight(0.20f))
                 AppetizerDetails(item.title, item.supplier, Modifier.weight(0.50f))
                 AppetizerIcon(
                     Icons.Filled.KeyboardArrowUp,
                     Modifier.weight(0.15f)
-                ) { onIncreaseAction(item.id) }
+                ) { onIncreaseAction(item.id, item.quantity + 1) }
             } else {
                 AppetizerQuantity(item.quantity, item.bufferSize, modifier = Modifier.weight(0.20f))
                 AppetizerDetails(item.title, item.supplier, Modifier.weight(0.80f))
