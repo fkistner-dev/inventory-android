@@ -6,7 +6,7 @@
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.ui.screen
+package com.kilomobi.cigobox.presentation.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

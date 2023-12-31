@@ -6,7 +6,7 @@
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.model
+package com.kilomobi.cigobox.domain
 
 data class BoxOperation(
     val playerCount: Int,

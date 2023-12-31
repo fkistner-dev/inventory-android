@@ -1,35 +1,37 @@
 /*
  * Created by fkistner.
  * fabrice.kistner.pro@gmail.com
- * Last modified on 22/12/2023 21:51.
+ * Last modified on 31/12/2023 01:07.
  * Copyright (c) 2023.
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.viewmodel
+package com.kilomobi.cigobox.presentation.list
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kilomobi.cigobox.data.InventoryRepository
-import com.kilomobi.cigobox.ui.screen.InventoryScreenState
-import com.kilomobi.cigobox.model.BoxOperation
-import com.kilomobi.cigobox.model.Category
-import com.kilomobi.cigobox.model.toCategory
+import com.kilomobi.cigobox.domain.GetInitialAppetizersUseCase
+import com.kilomobi.cigobox.domain.BoxOperation
+import com.kilomobi.cigobox.domain.Category
+import com.kilomobi.cigobox.domain.GetFilteredAppetizersUseCase
+import com.kilomobi.cigobox.domain.UpdateQuantityUseCase
+import com.kilomobi.cigobox.domain.ValidateBoxWithdrawalUseCase
+import com.kilomobi.cigobox.domain.ValidateEditStockUseCase
 import kotlinx.coroutines.*
 
 class InventoryViewModel : ViewModel() {
-    private val repository = InventoryRepository()
+    private val getAppetizersUseCase = GetInitialAppetizersUseCase()
     private val _state = mutableStateOf(
         InventoryScreenState(
-        appetizers = emptyList(),
-        isLoading = true,
-        allowEdit = false,
-        isBoxScreen = false,
-        selectedFilter = Category.TOUT,
-        selectedPlayerBox = 0
-    )
+            appetizers = emptyList(),
+            isLoading = true,
+            allowEdit = false,
+            isBoxScreen = false,
+            selectedFilter = Category.TOUT,
+            selectedPlayerBox = 0
+        )
     )
 
     val state: State<InventoryScreenState>
@@ -44,16 +46,12 @@ class InventoryViewModel : ViewModel() {
     }
 
     init {
-        initializeInventory()
+        loadInventory()
     }
 
-    fun initializeInventory() {
-        getInventory()
-    }
-
-    private fun getInventory() {
+    fun loadInventory() {
         viewModelScope.launch(errorHandler) {
-            val remoteList = repository.getAllInventory()
+            val remoteList = getAppetizersUseCase()
             val appetizerList = remoteList.map { it.copy(isVisible = true) }
             _state.value = _state.value.copy(
                 appetizers = appetizerList,
@@ -64,24 +62,11 @@ class InventoryViewModel : ViewModel() {
     }
 
     fun updateQuantity(id: Int, quantityChange: Int) {
-        val appetizers = _state.value.appetizers.toMutableList()
-        val itemIndex = appetizers.indexOfFirst { it.id == id }
-
-        if (itemIndex != -1) {
-            val item = appetizers[itemIndex]
-            val newQuantity = quantityChange.coerceAtLeast(0)
-
-            appetizers[itemIndex] =
-                item.copy(
-                    quantity = newQuantity,
-                    isQuantityUpdated = true
-                )
+        viewModelScope.launch(errorHandler) {
+            val appetizers = UpdateQuantityUseCase().invoke(id, quantityChange)
             _state.value = _state.value.copy(
                 appetizers = appetizers
             )
-            viewModelScope.launch {
-                repository.updateLocalQuantity(id, item.quantity)
-            }
         }
     }
 
@@ -131,16 +116,12 @@ class InventoryViewModel : ViewModel() {
 
     // Used to filters between categories, and return a list with correct items visibility
     fun filterAction(category: Category) {
-        val currentList = _state.value.appetizers
-        val filteredList =
-            currentList.filter { it.category.toCategory().name == category.name || category.name == Category.TOUT.name }
-        val visibleList = currentList.map { item ->
-            item.copy(isVisible = item in filteredList)
+        viewModelScope.launch(errorHandler) {
+            _state.value = _state.value.copy(
+                appetizers = GetFilteredAppetizersUseCase().invoke(category),
+                selectedFilter = category
+            )
         }
-        _state.value = _state.value.copy(
-            appetizers = visibleList,
-            selectedFilter = category
-        )
     }
 
     fun selectBoxAction(playerCount: Int) {
@@ -151,23 +132,23 @@ class InventoryViewModel : ViewModel() {
 
     // Update each modified item on remote db and handle toggles
     fun validateStock() {
-        if (_state.value.allowEdit) {
-            viewModelScope.launch(errorHandler) {
-                val appetizers = _state.value.appetizers.filter { it.isQuantityUpdated }
-                appetizers.forEach {
-                    updateQuantity(it.id, it.quantity)
+        viewModelScope.launch(errorHandler) {
+            var appetizers = getAppetizersUseCase()
+
+            if (_state.value.allowEdit) {
+                viewModelScope.launch(errorHandler) {
+                    appetizers = ValidateEditStockUseCase().invoke(_state.value.appetizers)
                 }
-                repository.pushUpdatedQuantities(appetizers)
-            }
-        } else if (_state.value.isBoxScreen) {
-            viewModelScope.launch(errorHandler) {
-                val boxOperations = getBoxOperationList(_state.value.selectedPlayerBox)
-                    .filter { it.withdrawQuantity > 0 }
-                boxOperations.forEach {
-                    updateQuantity(it.appetizerId, it.boxQuantity - it.withdrawQuantity)
+            } else if (_state.value.isBoxScreen) {
+                viewModelScope.launch(errorHandler) {
+                    appetizers = ValidateBoxWithdrawalUseCase().invoke(_state.value.selectedPlayerBox)
                 }
-                repository.pushUpdatedOperations(boxOperations)
             }
+
+            // Refresh appetizers state
+            _state.value = _state.value.copy(
+                appetizers = appetizers
+            )
         }
 
         // Disable change

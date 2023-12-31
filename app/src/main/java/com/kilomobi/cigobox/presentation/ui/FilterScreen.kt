@@ -6,7 +6,7 @@
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.ui.screen
+package com.kilomobi.cigobox.presentation.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.kilomobi.cigobox.model.Category
+import com.kilomobi.cigobox.domain.Category
 import com.kilomobi.cigobox.ui.theme.CigOrange
 import com.kilomobi.cigobox.ui.theme.CigoGrey
 

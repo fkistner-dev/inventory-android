@@ -6,7 +6,7 @@
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.model
+package com.kilomobi.cigobox.domain
 
 enum class Category {
     TOUT,

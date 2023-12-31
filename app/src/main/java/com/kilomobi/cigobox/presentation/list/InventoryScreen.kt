@@ -1,12 +1,12 @@
 /*
  * Created by fkistner.
  * fabrice.kistner.pro@gmail.com
- * Last modified on 22/12/2023 21:51.
+ * Last modified on 31/12/2023 01:07.
  * Copyright (c) 2023.
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.ui.screen
+package com.kilomobi.cigobox.presentation.list
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -42,19 +42,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.kilomobi.cigobox.model.Appetizer
-import com.kilomobi.cigobox.model.BoxOperation
-import com.kilomobi.cigobox.model.Category
-import com.kilomobi.cigobox.viewmodel.InventoryViewModel
+import com.kilomobi.cigobox.domain.Appetizer
+import com.kilomobi.cigobox.domain.BoxOperation
+import com.kilomobi.cigobox.domain.Category
+import com.kilomobi.cigobox.presentation.ui.HeaderItem
+import com.kilomobi.cigobox.presentation.ui.HorizontalFilterRow
 import com.kilomobi.cigobox.ui.theme.CigOrange
 import com.kilomobi.cigobox.ui.theme.CigoGrey
 
 @Composable
-fun InventoryScreen() {
-    val viewModel: InventoryViewModel = viewModel()
-    val state = viewModel.state.value
-
+fun InventoryScreen(
+    state: InventoryScreenState,
+    toggleEdit: () -> Unit,
+    subtractBox: () -> Unit,
+    validateStock: () -> Unit,
+    getBoxOperationList: (playerCount: Int) -> List<BoxOperation>,
+    selectBoxAction: (playerCount: Int) -> Unit,
+    filterAction: (category: Category) -> Unit,
+    updateQuantity: (id: Int, quantity: Int) -> Unit,
+    loadInventory: () -> Unit
+) {
     LazyColumn(
         contentPadding = PaddingValues(
             vertical = 8.dp,
@@ -67,20 +74,20 @@ fun InventoryScreen() {
                 state.allowEdit,
                 state.isBoxScreen,
                 state.selectedPlayerBox,
-                { viewModel.toggleEdit() },
-                { viewModel.subtractBox() },
-                { viewModel.validateStock() })
+                { toggleEdit() },
+                { subtractBox() },
+                { validateStock() })
         }
 
         if (state.isBoxScreen) {
             val boxList = listOf(3, 4, 5, 6, 7)
             items(boxList) { playerCount ->
-                val boxOperations = viewModel.getBoxOperationList(playerCount)
+                val boxOperations = getBoxOperationList(playerCount)
                 BoxItem(
                     playerCount.toString(),
                     boxOperations,
                     state.selectedPlayerBox
-                ) { id -> viewModel.selectBoxAction(id) }
+                ) { id -> selectBoxAction(id) }
             }
         } else {
             item {
@@ -96,7 +103,7 @@ fun InventoryScreen() {
                     filterList,
                     selectedFilter = state.selectedFilter,
                     onFilterSelected = { selectedFilter ->
-                        viewModel.filterAction(selectedFilter)
+                        filterAction(selectedFilter)
                     })
             }
             items(state.appetizers) { appetizer ->
@@ -105,13 +112,13 @@ fun InventoryScreen() {
                         item = appetizer,
                         state.allowEdit,
                         onIncreaseAction = { id, quantity ->
-                            viewModel.updateQuantity(
+                            updateQuantity(
                                 id,
                                 quantity
                             )
                         },
                         onDecreaseAction = { id, quantity ->
-                            viewModel.updateQuantity(
+                            updateQuantity(
                                 id,
                                 quantity
                             )
@@ -127,8 +134,10 @@ fun InventoryScreen() {
                 text = state.error,
                 modifier = Modifier.align(Alignment.Center),
             )
-            Button(onClick = { viewModel.initializeInventory() },
-                modifier = Modifier.align(Alignment.BottomCenter)) {
+            Button(
+                onClick = { loadInventory() },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
                 Text(text = "Retry")
             }
         }

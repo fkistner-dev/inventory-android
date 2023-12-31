@@ -1,27 +1,25 @@
 /*
  * Created by fkistner.
  * fabrice.kistner.pro@gmail.com
- * Last modified on 22/12/2023 21:51.
+ * Last modified on 31/12/2023 01:04.
  * Copyright (c) 2023.
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.data
+package com.kilomobi.cigobox.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.kilomobi.cigobox.data.dao.InventoryDao
-import com.kilomobi.cigobox.model.Appetizer
 
 @Database(
-    entities = [Appetizer::class],
-    version = 1,
+    entities = [LocalAppetizer::class],
+    version = 3,
     exportSchema = false
 )
-@TypeConverters(Appetizer.UsedInBoxConverter::class)
+@TypeConverters(LocalAppetizer.UsedInBoxConverter::class)
 abstract class InventoryDb : RoomDatabase() {
     abstract val dao: InventoryDao
 

@@ -10,10 +10,12 @@ package com.kilomobi.cigobox.data
 
 import com.kilomobi.cigobox.BuildConfig
 import com.kilomobi.cigobox.CigoBoxApplication
-import com.kilomobi.cigobox.data.api.InventoryApiService
-import com.kilomobi.cigobox.model.Appetizer
-import com.kilomobi.cigobox.model.BoxOperation
-import com.kilomobi.cigobox.model.PartialAppetizer
+import com.kilomobi.cigobox.data.local.InventoryDb
+import com.kilomobi.cigobox.data.remote.InventoryApiService
+import com.kilomobi.cigobox.domain.Appetizer
+import com.kilomobi.cigobox.domain.BoxOperation
+import com.kilomobi.cigobox.data.local.LocalAppetizer
+import com.kilomobi.cigobox.data.local.PartialLocalAppetizer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -30,7 +32,29 @@ class InventoryRepository {
         .build()
         .create(InventoryApiService::class.java)
 
-    suspend fun getAllInventory(): List<Appetizer> {
+    suspend fun getInventory(): List<Appetizer> {
+        return withContext(Dispatchers.IO) {
+            return@withContext inventoryDao.getAll().map {
+                Appetizer(
+                    it.id,
+                    it.title,
+                    it.supplier,
+                    it.category,
+                    it.quantity,
+                    it.bufferSize,
+                    isQuantityUpdated = false,
+                    isVisible = true,
+                    usedInBox = it.usedInBox.map { box ->
+                        Appetizer.UsedInBox(
+                            box.playerCount,
+                            box.boxQuantity
+                        )
+                    })
+            }
+        }
+    }
+
+    suspend fun loadInventory() {
         return withContext(Dispatchers.IO) {
             try {
                 refreshCache()
@@ -46,13 +70,27 @@ class InventoryRepository {
                     else -> throw e
                 }
             }
-            return@withContext inventoryDao.getAll()
         }
     }
 
     private suspend fun refreshCache() {
         val remoteInventory = restInterface.getInventory()
-        inventoryDao.addAll(remoteInventory)
+        inventoryDao.addAll(remoteInventory.map {
+            LocalAppetizer(
+                it.id,
+                it.title,
+                it.supplier,
+                it.category,
+                it.quantity,
+                it.bufferSize,
+                it.usedInBox.map { box ->
+                    LocalAppetizer.LocalUsedInBox(
+                        box.playerCount,
+                        box.boxQuantity
+                    )
+                }
+            )
+        })
     }
 
     private suspend fun updateRemoteQuantity(id: Int, quantity: Int): Boolean {
@@ -69,7 +107,7 @@ class InventoryRepository {
 
     suspend fun updateLocalQuantity(id: Int, value: Int) {
         withContext(Dispatchers.IO) {
-            inventoryDao.update(PartialAppetizer(id, value))
+            inventoryDao.update(PartialLocalAppetizer(id, value))
             // Retrieve the content of our local db
             inventoryDao.getAll()
         }
