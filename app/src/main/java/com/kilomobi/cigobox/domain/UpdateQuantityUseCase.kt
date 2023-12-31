@@ -9,10 +9,12 @@
 package com.kilomobi.cigobox.domain
 
 import com.kilomobi.cigobox.data.InventoryRepository
+import javax.inject.Inject
 
-class UpdateQuantityUseCase {
-    private val repository: InventoryRepository = InventoryRepository()
-    private val getAppetizersUseCase = GetAppetizersUseCase()
+class UpdateQuantityUseCase @Inject constructor(
+    private val repository: InventoryRepository,
+    private val getAppetizersUseCase: GetAppetizersUseCase
+) {
     suspend operator fun invoke(id: Int, quantity: Int): List<Appetizer> {
         val appetizers = getAppetizersUseCase().toMutableList()
         val itemIndex = appetizers.indexOfFirst { it.id == id }

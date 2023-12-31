@@ -19,10 +19,19 @@ import com.kilomobi.cigobox.domain.GetFilteredAppetizersUseCase
 import com.kilomobi.cigobox.domain.UpdateQuantityUseCase
 import com.kilomobi.cigobox.domain.ValidateBoxWithdrawalUseCase
 import com.kilomobi.cigobox.domain.ValidateEditStockUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class InventoryViewModel : ViewModel() {
-    private val getAppetizersUseCase = GetInitialAppetizersUseCase()
+@HiltViewModel
+class InventoryViewModel @Inject constructor(
+    private val getAppetizersUseCase: GetInitialAppetizersUseCase,
+    private val getFilteredAppetizersUseCase: GetFilteredAppetizersUseCase,
+    private val validateEditStockUseCase: ValidateEditStockUseCase,
+    private val validateBoxWithdrawalUseCase: ValidateBoxWithdrawalUseCase,
+    private val updateQuantityUseCase: UpdateQuantityUseCase
+
+): ViewModel() {
     private val _state = mutableStateOf(
         InventoryScreenState(
             appetizers = emptyList(),
@@ -63,7 +72,7 @@ class InventoryViewModel : ViewModel() {
 
     fun updateQuantity(id: Int, quantityChange: Int) {
         viewModelScope.launch(errorHandler) {
-            val appetizers = UpdateQuantityUseCase().invoke(id, quantityChange)
+            val appetizers = updateQuantityUseCase(id, quantityChange)
             _state.value = _state.value.copy(
                 appetizers = appetizers
             )
@@ -118,7 +127,7 @@ class InventoryViewModel : ViewModel() {
     fun filterAction(category: Category) {
         viewModelScope.launch(errorHandler) {
             _state.value = _state.value.copy(
-                appetizers = GetFilteredAppetizersUseCase().invoke(category),
+                appetizers = getFilteredAppetizersUseCase(category),
                 selectedFilter = category
             )
         }
@@ -137,11 +146,11 @@ class InventoryViewModel : ViewModel() {
 
             if (_state.value.allowEdit) {
                 viewModelScope.launch(errorHandler) {
-                    appetizers = ValidateEditStockUseCase().invoke(_state.value.appetizers)
+                    appetizers = validateEditStockUseCase(_state.value.appetizers)
                 }
             } else if (_state.value.isBoxScreen) {
                 viewModelScope.launch(errorHandler) {
-                    appetizers = ValidateBoxWithdrawalUseCase().invoke(_state.value.selectedPlayerBox)
+                    appetizers = validateBoxWithdrawalUseCase(_state.value.selectedPlayerBox)
                 }
             }
 

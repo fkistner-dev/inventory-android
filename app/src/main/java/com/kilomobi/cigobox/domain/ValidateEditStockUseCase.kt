@@ -8,12 +8,14 @@
 
 package com.kilomobi.cigobox.domain
 
-class ValidateEditStockUseCase {
-    private val getAppetizersUseCase = GetAppetizersUseCase()
-    private val getUpdatedAppetizersUseCase = GetUpdatedAppetizersUseCase()
-    private val updateQuantityUseCase = UpdateQuantityUseCase()
-    private val updateRemoteStockUseCase = UpdateRemoteStockUseCase()
+import javax.inject.Inject
 
+class ValidateEditStockUseCase @Inject constructor(
+    private val getAppetizersUseCase: GetAppetizersUseCase,
+    private val getUpdatedAppetizersUseCase: GetUpdatedAppetizersUseCase,
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val updateRemoteStockUseCase: UpdateRemoteStockUseCase
+) {
     suspend operator fun invoke(
         appetizers: List<Appetizer>
     ): List<Appetizer> {

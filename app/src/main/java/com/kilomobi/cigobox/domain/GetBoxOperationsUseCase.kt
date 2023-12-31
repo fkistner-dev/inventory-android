@@ -8,9 +8,11 @@
 
 package com.kilomobi.cigobox.domain
 
-class GetBoxOperationsUseCase {
-    private val getInitialAppetizersUseCase = GetInitialAppetizersUseCase()
+import javax.inject.Inject
 
+class GetBoxOperationsUseCase @Inject constructor(
+    private val getInitialAppetizersUseCase: GetInitialAppetizersUseCase
+) {
     suspend operator fun invoke(playerCount: Int): List<BoxOperation> {
         val currentList = getInitialAppetizersUseCase()
         val boxOperationList = mutableListOf<BoxOperation>()

@@ -8,7 +8,9 @@
 
 package com.kilomobi.cigobox.domain
 
-class GetUpdatedAppetizersUseCase {
+import javax.inject.Inject
+
+class GetUpdatedAppetizersUseCase @Inject constructor() {
     operator fun invoke(
         appetizers: List<Appetizer>
     ): List<Appetizer> {

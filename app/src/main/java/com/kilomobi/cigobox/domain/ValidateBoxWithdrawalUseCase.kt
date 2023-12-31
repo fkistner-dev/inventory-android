@@ -9,12 +9,14 @@
 package com.kilomobi.cigobox.domain
 
 import com.kilomobi.cigobox.data.InventoryRepository
+import javax.inject.Inject
 
-class ValidateBoxWithdrawalUseCase {
-    private val repository: InventoryRepository = InventoryRepository()
-    private val getAppetizersUseCase = GetAppetizersUseCase()
-    private val getBoxOperationsUseCase = GetBoxOperationsUseCase()
-    private val updateQuantityUseCase = UpdateQuantityUseCase()
+class ValidateBoxWithdrawalUseCase @Inject constructor(
+    private val repository: InventoryRepository,
+    private val getAppetizersUseCase: GetAppetizersUseCase,
+    private val getBoxOperationsUseCase: GetBoxOperationsUseCase,
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
+) {
 
     suspend operator fun invoke(playerCount: Int): List<Appetizer> {
         val boxOperations = getBoxOperationsUseCase(playerCount)

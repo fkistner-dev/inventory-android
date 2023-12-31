@@ -17,13 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kilomobi.cigobox.domain.Category
 import com.kilomobi.cigobox.presentation.list.InventoryScreen
 import com.kilomobi.cigobox.presentation.list.InventoryScreenState
 import com.kilomobi.cigobox.presentation.list.InventoryViewModel
 import com.kilomobi.cigobox.ui.theme.CigoBoxTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    val viewModel: InventoryViewModel = viewModel()
+                    val viewModel: InventoryViewModel = hiltViewModel()
                     InventoryScreen(
                         state = viewModel.state.value,
                         toggleEdit = { viewModel.toggleEdit() },

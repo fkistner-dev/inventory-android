@@ -9,10 +9,11 @@
 package com.kilomobi.cigobox.domain
 
 import com.kilomobi.cigobox.data.InventoryRepository
+import javax.inject.Inject
 
-class GetAppetizersUseCase {
-    private val repository: InventoryRepository = InventoryRepository()
-
+class GetAppetizersUseCase @Inject constructor(
+    private val repository: InventoryRepository
+) {
     suspend operator fun invoke() : List<Appetizer> {
         return repository.getInventory().sortedBy { it.title }
     }

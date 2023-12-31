@@ -8,9 +8,7 @@
 
 package com.kilomobi.cigobox.data
 
-import com.kilomobi.cigobox.BuildConfig
-import com.kilomobi.cigobox.CigoBoxApplication
-import com.kilomobi.cigobox.data.local.InventoryDb
+import com.kilomobi.cigobox.data.local.InventoryDao
 import com.kilomobi.cigobox.data.remote.InventoryApiService
 import com.kilomobi.cigobox.domain.Appetizer
 import com.kilomobi.cigobox.domain.BoxOperation
@@ -19,19 +17,14 @@ import com.kilomobi.cigobox.data.local.PartialLocalAppetizer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.net.ConnectException
 import java.net.UnknownHostException
+import javax.inject.Inject
 
-class InventoryRepository {
-    private var inventoryDao = InventoryDb.getDaoInstance(CigoBoxApplication.getAppContext())
-    private val restInterface = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(BuildConfig.DATABASE_URL)
-        .build()
-        .create(InventoryApiService::class.java)
-
+class InventoryRepository @Inject constructor(
+    private val restInterface: InventoryApiService,
+    private var inventoryDao: InventoryDao
+) {
     suspend fun getInventory(): List<Appetizer> {
         return withContext(Dispatchers.IO) {
             return@withContext inventoryDao.getAll().map {

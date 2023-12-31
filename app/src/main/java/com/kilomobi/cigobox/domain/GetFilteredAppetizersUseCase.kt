@@ -10,9 +10,11 @@ package com.kilomobi.cigobox.domain
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class GetFilteredAppetizersUseCase {
-    private val getInitialAppetizersUseCase = GetInitialAppetizersUseCase()
+class GetFilteredAppetizersUseCase @Inject constructor(
+    private val getInitialAppetizersUseCase: GetInitialAppetizersUseCase
+) {
     suspend operator fun invoke(
         category: Category
     ): List<Appetizer> {

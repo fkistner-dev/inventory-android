@@ -9,10 +9,11 @@
 package com.kilomobi.cigobox.domain
 
 import com.kilomobi.cigobox.data.InventoryRepository
+import javax.inject.Inject
 
-class UpdateRemoteStockUseCase {
-    private val repository: InventoryRepository = InventoryRepository()
-
+class UpdateRemoteStockUseCase @Inject constructor(
+    private val repository: InventoryRepository
+) {
     suspend operator fun invoke(appetizers: List<Appetizer>) {
         repository.pushUpdatedQuantities(appetizers)
     }
