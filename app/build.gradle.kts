@@ -22,8 +22,8 @@ android {
         applicationId = "com.kilomobi.cigobox"
         minSdk = 21
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 4
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -89,7 +89,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -103,7 +103,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
     implementation("com.google.dagger:hilt-android:2.50")
-    kapt ("com.google.dagger:hilt-compiler:2.50")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("com.google.dagger:hilt-compiler:2.50")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
 }
