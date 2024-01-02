@@ -1,13 +1,14 @@
 /*
  * Created by fkistner.
  * fabrice.kistner.pro@gmail.com
- * Last modified on 31/12/2023 11:44.
- * Copyright (c) 2023.
+ * Last modified on 02/01/2024 12:21.
+ * Copyright (c) 2024.
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.domain
+package com.kilomobi.cigobox.domain.usecase
 
+import com.kilomobi.cigobox.domain.Appetizer
 import javax.inject.Inject
 
 class ValidateEditStockUseCase @Inject constructor(
@@ -21,7 +22,7 @@ class ValidateEditStockUseCase @Inject constructor(
     ): List<Appetizer> {
         val updatedAppetizers = getUpdatedAppetizersUseCase(appetizers)
         updatedAppetizers.forEach {
-            updateQuantityUseCase(it.id, it.quantity)
+            updateQuantityUseCase(updatedAppetizers, it.id, it.quantity)
         }
         updateRemoteStockUseCase(updatedAppetizers)
         return getAppetizersUseCase()

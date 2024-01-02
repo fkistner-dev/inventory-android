@@ -12,20 +12,20 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kilomobi.cigobox.domain.GetInitialAppetizersUseCase
+import com.kilomobi.cigobox.domain.usecase.GetInitialAppetizersUseCase
 import com.kilomobi.cigobox.domain.BoxOperation
 import com.kilomobi.cigobox.domain.Category
-import com.kilomobi.cigobox.domain.GetFilteredAppetizersUseCase
-import com.kilomobi.cigobox.domain.UpdateQuantityUseCase
-import com.kilomobi.cigobox.domain.ValidateBoxWithdrawalUseCase
-import com.kilomobi.cigobox.domain.ValidateEditStockUseCase
+import com.kilomobi.cigobox.domain.usecase.GetFilteredAppetizersUseCase
+import com.kilomobi.cigobox.domain.usecase.UpdateQuantityUseCase
+import com.kilomobi.cigobox.domain.usecase.ValidateBoxWithdrawalUseCase
+import com.kilomobi.cigobox.domain.usecase.ValidateEditStockUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
-    private val getAppetizersUseCase: GetInitialAppetizersUseCase,
+    private val getInitialAppetizersUseCase: GetInitialAppetizersUseCase,
     private val getFilteredAppetizersUseCase: GetFilteredAppetizersUseCase,
     private val validateEditStockUseCase: ValidateEditStockUseCase,
     private val validateBoxWithdrawalUseCase: ValidateBoxWithdrawalUseCase,
@@ -60,7 +60,7 @@ class InventoryViewModel @Inject constructor(
 
     fun loadInventory() {
         viewModelScope.launch(errorHandler) {
-            val remoteList = getAppetizersUseCase()
+            val remoteList = getInitialAppetizersUseCase()
             val appetizerList = remoteList.map { it.copy(isVisible = true) }
             _state.value = _state.value.copy(
                 appetizers = appetizerList,
@@ -72,7 +72,7 @@ class InventoryViewModel @Inject constructor(
 
     fun updateQuantity(id: Int, quantityChange: Int) {
         viewModelScope.launch(errorHandler) {
-            val appetizers = updateQuantityUseCase(id, quantityChange)
+            val appetizers = updateQuantityUseCase(_state.value.appetizers, id, quantityChange)
             _state.value = _state.value.copy(
                 appetizers = appetizers
             )
@@ -105,7 +105,6 @@ class InventoryViewModel @Inject constructor(
                 )
             }
         }
-
         return boxOperationList
     }
 
@@ -142,25 +141,21 @@ class InventoryViewModel @Inject constructor(
     // Update each modified item on remote db and handle toggles
     fun validateStock() {
         viewModelScope.launch(errorHandler) {
-            var appetizers = getAppetizersUseCase()
+            var appetizers = _state.value.appetizers
 
             if (_state.value.allowEdit) {
-                viewModelScope.launch(errorHandler) {
-                    appetizers = validateEditStockUseCase(_state.value.appetizers)
-                }
+                appetizers = validateEditStockUseCase(appetizers)
             } else if (_state.value.isBoxScreen) {
-                viewModelScope.launch(errorHandler) {
-                    appetizers = validateBoxWithdrawalUseCase(_state.value.selectedPlayerBox)
-                }
+                appetizers = validateBoxWithdrawalUseCase(appetizers, _state.value.selectedPlayerBox)
             }
 
             // Refresh appetizers state
             _state.value = _state.value.copy(
                 appetizers = appetizers
             )
-        }
 
-        // Disable change
-        toggleReset()
+            // Disable change
+            toggleReset()
+        }
     }
 }

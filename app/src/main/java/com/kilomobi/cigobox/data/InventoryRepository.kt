@@ -8,12 +8,14 @@
 
 package com.kilomobi.cigobox.data
 
+import com.kilomobi.cigobox.data.di.IoDispatcher
 import com.kilomobi.cigobox.data.local.InventoryDao
 import com.kilomobi.cigobox.data.remote.InventoryApiService
 import com.kilomobi.cigobox.domain.Appetizer
 import com.kilomobi.cigobox.domain.BoxOperation
 import com.kilomobi.cigobox.data.local.LocalAppetizer
 import com.kilomobi.cigobox.data.local.PartialLocalAppetizer
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -23,7 +25,8 @@ import javax.inject.Inject
 
 class InventoryRepository @Inject constructor(
     private val restInterface: InventoryApiService,
-    private var inventoryDao: InventoryDao
+    private var inventoryDao: InventoryDao,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) {
     suspend fun getInventory(): List<Appetizer> {
         return withContext(Dispatchers.IO) {

@@ -1,13 +1,14 @@
 /*
  * Created by fkistner.
  * fabrice.kistner.pro@gmail.com
- * Last modified on 31/12/2023 12:26.
- * Copyright (c) 2023.
+ * Last modified on 31/12/2023 15:41.
+ * Copyright (c) 2024.
  * All rights reserved.
  */
 
-package com.kilomobi.cigobox.domain
+package com.kilomobi.cigobox.domain.usecase
 
+import com.kilomobi.cigobox.domain.BoxOperation
 import javax.inject.Inject
 
 class GetBoxOperationsUseCase @Inject constructor(

@@ -16,6 +16,6 @@ enum class Category {
     SEC
 }
 
-fun String.toCategory() : Category {
+fun String.toCategory(): Category {
     return Category.valueOf(this)
 }
