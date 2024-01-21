@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.kilomobi.cigobox.domain.Appetizer
 import com.kilomobi.cigobox.domain.BoxOperation
 import com.kilomobi.cigobox.domain.Category
+import com.kilomobi.cigobox.domain.usecase.GetBoxItemTextUseCase
 import com.kilomobi.cigobox.presentation.ui.HeaderItem
 import com.kilomobi.cigobox.presentation.ui.HorizontalFilterRow
 import com.kilomobi.cigobox.ui.theme.CigOrange
@@ -68,7 +69,6 @@ fun InventoryScreen(
             horizontal = 8.dp
         )
     ) {
-
         item {
             HeaderItem(
                 state.allowEdit,
@@ -199,16 +199,7 @@ fun BoxItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp)
         ) {
-            val appetizersText = boxOperations
-                .filter { it.withdrawQuantity > 0 }
-                .groupBy { it.supplier }
-                .map { (_, groupOperations) ->
-                    groupOperations.joinToString(separator = " | ") {
-                        "${it.withdrawQuantity} ${it.title}" + if (it.withdrawQuantity > 1 && it.title.last() != 's') "s" else ""
-                    }
-                }
-                .joinToString(separator = " | ")
-
+            val appetizersText = GetBoxItemTextUseCase().invoke(boxOperations)
             AppetizerDetails("Box pour $playerCount", appetizersText, Modifier.weight(0.80f))
         }
     }
